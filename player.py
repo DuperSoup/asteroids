@@ -1,6 +1,7 @@
 import pygame
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED
+from constants import *
+from shot import Shot
 # from main import screen
 
 class Player(CircleShape):
@@ -8,6 +9,7 @@ class Player(CircleShape):
         super().__init__(x, y, radius)
         self.radius = PLAYER_RADIUS
         self.rotation = 0
+        self.shottimer = 0
 
         # Create surface for sprite
         # size = radius * 2
@@ -33,6 +35,13 @@ class Player(CircleShape):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
 
+    def shoot(self):
+        if self.shottimer <= 0:
+            newshot = Shot(self.position[0], self.position[1], SHOT_RADIUS)
+            forward = pygame.Vector2(0, 1).rotate(self.rotation)
+            newshot.velocity = forward * PLAYER_SHOOT_SPEED
+            self.shottimer = PLAYER_SHOOT_COOLDOWN
+
     def update(self, dt):
         keys = pygame.key.get_pressed()
 
@@ -44,4 +53,7 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
+        if keys[pygame.K_SPACE]:
+            self.shoot()
     
+        self.shottimer -= dt
